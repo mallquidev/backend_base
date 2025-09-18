@@ -13,6 +13,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.deone.base.bussoft.core.domain.app.bussines.service.user.UserService;
 
@@ -30,6 +31,7 @@ public class SecurityConfig {
         http
             .cors(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable())
+            .httpBasic(Customizer.withDefaults())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> {
                 auth.requestMatchers(EndpointSecurityConstant.ENDPOINT_PUBLIC).permitAll();
@@ -38,8 +40,19 @@ public class SecurityConfig {
                 auth.anyRequest().authenticated();
 
             })
-            .httpBasic(Customizer.withDefaults());
+            .exceptionHandling(exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint()))
+            .addFilterBefore(securityFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
+    }
+
+    @Bean
+    public CustomAuthenticationEntryPoint customAuthenticationEntryPoint() {
+        return new CustomAuthenticationEntryPoint();
+    }
+
+    @Bean
+    public SecurityFilter securityFilter(){
+        return new SecurityFilter();
     }
 
     @Bean

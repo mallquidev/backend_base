@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService{
 
             //mapear roles a authorites
             List<GrantedAuthority> authorities = roles.stream()
-                .map(ru -> new SimpleGrantedAuthority(ru.getRole().getName().name()))
+                .map(ru -> new SimpleGrantedAuthority("ROLE_"+ru.getRole().getName().name()))
                 .collect(Collectors.toList());
 
             //devolver un UserDetails que spring security pueda usar
